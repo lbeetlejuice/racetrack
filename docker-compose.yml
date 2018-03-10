@@ -1,0 +1,11 @@
+version: '3'
+services:
+  racetrack:
+    build: ./
+    command: sh /src/racetrack/start.sh 
+    volumes:
+      - ./:/src/racetrack
+    ports:
+      - 3000:3000
+   
+
