@@ -59,8 +59,19 @@ function newPlayer(name) {
 }
 
 
-function posValidityCheck(x,y) {
-  return gameState.track[x][y] == 0
+function posValidityCheck(col, row) {
+  var t = gameState.track;
+
+  var maxWidth = t[0].length;
+  var maxHeight = t.length;
+  console.log("x: " + col + " / " + maxWidth);
+  console.log("y: " + row + " / " + maxHeight);
+  
+  if (col < 0 || row < 0 || row >= maxHeight || col >= maxWidth) {
+    return false
+  } else {
+    return gameState.track[row][col] != 1
+  }
 }
 
 
