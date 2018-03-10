@@ -2,52 +2,56 @@ var socket;
 var trackWidth = 800;   // = 16 Zeilen
 var trackHeight = 600;  // = 12 Spalten
 var blockSize = 50;
-var cvn;
+
+var name;
+
 var track = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-              [1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-              [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-              [1,0,0,0,0,0,0,3,2,0,0,0,0,0,0,1],
-              [1,1,0,0,0,0,0,3,2,0,0,0,0,0,1,1],
-              [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
+							[1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+							[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+							[1,0,0,0,0,0,0,3,2,0,0,0,0,0,0,1],
+							[1,1,0,0,0,0,0,3,2,0,0,0,0,0,1,1],
+							[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
 
 function setup() {
-  cvn = createCanvas(trackWidth,trackHeight);
-  socket = io.connect('http://localhost:3000');
-  socket.on('mouse', newDrawing);
-  socket.emit('i_am_ready');
-  socket.on('init', (ds) => {
-    drawBackground();
-  });
-  message();
+	createCanvas(trackWidth,trackHeight);
+	socket = io.connect('http://localhost:3000');
+  
+  name = message();
+  socket.emit('register_request', name);
+
+  // register for events	
+	socket.on('update', update);
 }
 
-function newDrawing(data){
-  // noStroke();
-  // fill(255,0,100);
-  // ellipse(data.x,data.y,20,20);
+function update(gameState) {
+  console.log(gameState.message);
+
+  drawBackground();
+  gameState.players.forEach( (p) => {
+  console.log(p);
+    // @Luki, draw the car images here
+  });
 }
 
 function mouseDragged(){
-  console.log('Sending: ' +mouseX + ', '+mouseY);
+	var data = {
+    name: name,
+		x: mouseX,
+		y: mouseY
+	}
+  
+	socket.emit('mouse', data);
 
-  var data = {
-    x: mouseX,
-    y: mouseY
-  }
-  socket.emit('mouse', data);
-
+  // #Luki WIP
   var my = mouseY;
   var mx = mouseX;
   var aktField = []
-  // noStroke();
-  // fill(255);
-  // ellipse(mouseX,mouseY,20,20);
 }
 
 function drawBackground() {
@@ -80,5 +84,5 @@ function message() {
   } else {
     name = person;
   }
-  console.log(name);
+  return name;
 }
