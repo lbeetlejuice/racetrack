@@ -1,7 +1,6 @@
 {
   "name": "socket",
   "version": "1.0.0",
-  "description": "",
   "main": "sketch.js",
   "scripts": {
     "serve": "nodemon index.js"
