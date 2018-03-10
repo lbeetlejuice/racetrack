@@ -63,13 +63,9 @@ function newPlayer(name) {
 // if name cannot be found within <gameState.players>, false is returned.
 function posValidityCheck(name, col, row) {
   // readability
-  var maxWidth = t[0].length;
-  var maxHeight = t.length;
+  var maxWidth = gameState.track[0].length;
+  var maxHeight = gameState.track.length;
   
-  // debugging
-  console.log("col: " + col + " / " + maxWidth);
-  console.log("row: " + row + " / " + maxHeight);
-
   player = findPlayer(name);
   
   // error handling
@@ -83,11 +79,11 @@ function posValidityCheck(name, col, row) {
     var validCol = vf[1];
 
     if (row == validRow && col == validCol) {
-      return true;
+      foundValidField = true;
     }
   });
 
-  return false
+  return foundValidField;
 }
 
 
