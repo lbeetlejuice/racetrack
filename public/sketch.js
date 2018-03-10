@@ -30,6 +30,8 @@ function setup() {
   for(var i = 1; i < 6; i++){
     imgs.push(loadImage("img/car"+i+".png"));
   }
+
+  socket.on('position_validity_res', colorizedField);
 }
 
 function update(gameState) {
@@ -40,26 +42,6 @@ function update(gameState) {
   console.log(p);
   image(imgs[1],p.px*blockSize, p.py*blockSize);
   });
-}
-
-function mouseMoved(){
-  var data = {
-    name: name,
-    x: mouseX,
-    y: mouseY
-  }
-  socket.emit('mouse', data);
-
-  // #Luki WIP
-  console.log(floor(mouseY/blockSize),floor(mouseX/blockSize));
-  aktFieldX = floor(mouseX/blockSize);
-  aktFieldY = floor(mouseY/blockSize);
-  colorizedField(aktFieldX,aktFieldY);
-}
-
-function colorizedField(aktFieldX,aktFieldY) {
-  fill(color('#ffe0e0'));
-  rect(aktFieldX*blockSize, aktFieldY*blockSize, blockSize, blockSize);
 }
 
 function drawBackground() {
@@ -80,6 +62,25 @@ function drawBackground() {
         draw(col, row, track[row][col]);
       }
     }
+}
+
+function mouseMoved(){
+  var data = {
+    name: name,
+    x: floor(mouseX/blockSize),
+    y: floor(mouseY/blockSize)
+  }
+  socket.emit('position_validity_req', data);
+}
+
+function colorizedField(data) {
+  if(data.valid){
+    fill(color('#00ff00'));
+    rect(data.x*blockSize, data.y*blockSize, blockSize, blockSize);
+  } else{
+    fill(color('#ff0000'));
+    rect(data.x*blockSize, data.y*blockSize, blockSize, blockSize);
+  }
 }
 
 function message() {
