@@ -33,9 +33,9 @@ function newConnection(socket){
   socket.on('position_validity_req', (data) => {
     socket.emit('position_validity_res', {
       name: data.name,
-      x: data.x,
-      y: data.y,
-      valid: posValidityCheck(data.x, data.y)
+      row: data.row,
+      col: data.row,
+      valid: posValidityCheck(data.col, data.row)
     });   
   });
 }
@@ -64,8 +64,8 @@ function posValidityCheck(col, row) {
 
   var maxWidth = t[0].length;
   var maxHeight = t.length;
-  console.log("x: " + col + " / " + maxWidth);
-  console.log("y: " + row + " / " + maxHeight);
+  console.log("col: " + col + " / " + maxWidth);
+  console.log("row: " + row + " / " + maxHeight);
   
   if (col < 0 || row < 0 || row >= maxHeight || col >= maxWidth) {
     return false
