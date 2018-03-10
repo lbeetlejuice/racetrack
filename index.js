@@ -33,7 +33,7 @@ function newConnection(socket){
       name: data.name,
       x: data.x,
       y: data.y,
-      valid = posValidityCheck(data)
+      valid: posValidityCheck(data)
     });   
   });
 }
