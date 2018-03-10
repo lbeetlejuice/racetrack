@@ -1,61 +1,53 @@
 var socket;
-var trackWidth = 800;
-var trackHeight = 600;
+var trackWidth = 800;   // = 16 Zeilen
+var trackHeight = 600;  // = 12 Spalten
 var blockSize = 50;
-
-var track = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-							[1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-							[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-							[1,0,0,0,0,0,0,3,2,0,0,0,0,0,0,1],
-							[1,1,0,0,0,0,0,3,2,0,0,0,0,0,1,1],
-							[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
-
 var cvn;
+var track = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+              [1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+              [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,0,0,0,3,2,0,0,0,0,0,0,1],
+              [1,1,0,0,0,0,0,3,2,0,0,0,0,0,1,1],
+              [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
 
 function setup() {
-	cvn = createCanvas(trackWidth,trackHeight);
-
-	// background(51);
-
-	socket = io.connect('http://localhost:3000');
-
-	socket.on('mouse', newDrawing);
-	socket.emit('i_am_ready');
-
-	socket.on('init', (ds) => {
-		// ds.forEach( (d) => {
-		// 	noStroke();
-		// 	fill(255);
-		// 	ellipse(d.x,d.y,20,20);
-		// });
-		drawBackground();
-	});
+  cvn = createCanvas(trackWidth,trackHeight);
+  socket = io.connect('http://localhost:3000');
+  socket.on('mouse', newDrawing);
+  socket.emit('i_am_ready');
+  socket.on('init', (ds) => {
+    drawBackground();
+  });
+  message();
 }
 
 function newDrawing(data){
-	noStroke();
-	fill(255,0,100);
-	ellipse(data.x,data.y,20,20);
+  // noStroke();
+  // fill(255,0,100);
+  // ellipse(data.x,data.y,20,20);
 }
 
 function mouseDragged(){
-	console.log('Sending: ' +mouseX + ', '+mouseY);
+  console.log('Sending: ' +mouseX + ', '+mouseY);
 
-	var data = {
-		x: mouseX,
-		y: mouseY
-	}
-	socket.emit('mouse', data);
+  var data = {
+    x: mouseX,
+    y: mouseY
+  }
+  socket.emit('mouse', data);
 
-	noStroke();
-	fill(255);
-	ellipse(mouseX,mouseY,20,20);
+  var my = mouseY;
+  var mx = mouseX;
+  var aktField = []
+  // noStroke();
+  // fill(255);
+  // ellipse(mouseX,mouseY,20,20);
 }
 
 function drawBackground() {
@@ -68,13 +60,25 @@ function drawBackground() {
 
     function draw(x,y,t) {
           fill(color(styleMap[t]));
-					rect(x*blockSize, y*blockSize, blockSize, blockSize);
-          // ctx.strokeRect(x*blockSize, y*blockSize, blockSize, blockSize);
+          rect(x*blockSize, y*blockSize, blockSize, blockSize);
     }
 
     for(var row=0; row < trackHeight/blockSize; row++) {
       for(var col=0; col < trackWidth/blockSize; col++) {
-        draw(row, col, track[row][col]);
+        draw(col, row, track[row][col]);
       }
     }
+}
+
+function message() {
+  var name = "";
+  var person = prompt("Please enter your name");
+  if (person == null || person == "") {
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i = 0; i < 5; i++)
+      name += possible.charAt(Math.floor(Math.random() * possible.length));
+  } else {
+    name = person;
+  }
+  console.log(name);
 }
