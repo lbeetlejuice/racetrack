@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var server = app.listen(3000);
 var utils = require("./utils");
+var maps = require("./maps");
 app.use(express.static('public'));
 
 var socket = require('socket.io');
@@ -11,6 +12,7 @@ io.sockets.on('connection', newConnection);
 
 // global data structure
 var gameState = {
+  track: maps.getDefaultTrack(),
   players: []
 };
 
@@ -31,9 +33,9 @@ function newConnection(socket){
   socket.on('position_validity_req', (data) => {
     socket.emit('position_validity_res', {
       name: data.name,
-      x: data.x,
-      y: data.y,
-      valid: posValidityCheck(data)
+      row: data.row,
+      col: data.row,
+      valid: posValidityCheck(data.col, data.row)
     });   
   });
 }
@@ -57,8 +59,19 @@ function newPlayer(name) {
 }
 
 
-function posValidityCheck(suggestion) {
-  return Math.random() >= 0.5
+function posValidityCheck(col, row) {
+  var t = gameState.track;
+
+  var maxWidth = t[0].length;
+  var maxHeight = t.length;
+  console.log("col: " + col + " / " + maxWidth);
+  console.log("row: " + row + " / " + maxHeight);
+  
+  if (col < 0 || row < 0 || row >= maxHeight || col >= maxWidth) {
+    return false
+  } else {
+    return gameState.track[row][col] != 1
+  }
 }
 
 
