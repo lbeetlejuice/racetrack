@@ -2,31 +2,34 @@ var socket;
 var trackWidth = 800;   // = 16 Zeilen
 var trackHeight = 600;  // = 12 Spalten
 var blockSize = 50;
-
+var imgs = [];
 var name;
 
 var track = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-							[1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-							[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-							[1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
-							[1,0,0,0,0,0,0,3,2,0,0,0,0,0,0,1],
-							[1,1,0,0,0,0,0,3,2,0,0,0,0,0,1,1],
-							[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
+              [1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+              [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,0,0,0,3,2,0,0,0,0,0,0,1],
+              [1,1,0,0,0,0,0,3,2,0,0,0,0,0,1,1],
+              [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
 
 function setup() {
-	createCanvas(trackWidth,trackHeight);
-	socket = io.connect('http://localhost:3000');
-  
+  createCanvas(trackWidth,trackHeight);
+  socket = io.connect('http://localhost:3000');
+
   name = message();
   socket.emit('register_request', name);
 
-  // register for events	
-	socket.on('update', update);
+  // register for events
+  socket.on('update', update);
+  for(var i = 1; i < 6; i++){
+    imgs.push(loadImage("img/car"+i+".png"));
+  }
 }
 
 function update(gameState) {
@@ -35,23 +38,28 @@ function update(gameState) {
   drawBackground();
   gameState.players.forEach( (p) => {
   console.log(p);
-    // @Luki, draw the car images here
+  image(imgs[1],p.px*blockSize, p.py*blockSize);
   });
 }
 
-function mouseDragged(){
-	var data = {
+function mouseMoved(){
+  var data = {
     name: name,
-		x: mouseX,
-		y: mouseY
-	}
-  
-	socket.emit('mouse', data);
+    x: mouseX,
+    y: mouseY
+  }
+  socket.emit('mouse', data);
 
   // #Luki WIP
-  var my = mouseY;
-  var mx = mouseX;
-  var aktField = []
+  console.log(floor(mouseY/blockSize),floor(mouseX/blockSize));
+  aktFieldX = floor(mouseX/blockSize);
+  aktFieldY = floor(mouseY/blockSize);
+  colorizedField(aktFieldX,aktFieldY);
+}
+
+function colorizedField(aktFieldX,aktFieldY) {
+  fill(color('#ffe0e0'));
+  rect(aktFieldX*blockSize, aktFieldY*blockSize, blockSize, blockSize);
 }
 
 function drawBackground() {
@@ -63,8 +71,8 @@ function drawBackground() {
     }
 
     function draw(x,y,t) {
-          fill(color(styleMap[t]));
-          rect(x*blockSize, y*blockSize, blockSize, blockSize);
+      fill(color(styleMap[t]));
+      rect(x*blockSize, y*blockSize, blockSize, blockSize);
     }
 
     for(var row=0; row < trackHeight/blockSize; row++) {
