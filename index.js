@@ -10,35 +10,40 @@ io.sockets.on('connection', newConnection);
 
 
 // global data structure
-var all_data = [];
-var players = [];
+var gameState = {
+  players: []
+};
+
 
 function newConnection(socket){
-  // console.log('new connection: '+socket.id);
-
-  socket.on('i_am_ready', () => {
-    socket.emit('init', all_data);
+  socket.on('register_request', (name) => {
+    gameState.players.push(newPlayer(name));
+    emitUpdate(socket, "A new player registered: " + name + ". Current number of players: " + gameState.players.length);
   });
 
-  socket.on('mouse', mouseMsg);
-
-  function mouseMsg(data){
-    all_data.push(data);
-    socket.broadcast.emit('mouse', data);
+  socket.on('mouse', (data) => {
+    // socket.broadcast.emit('mouse', data);
     console.log(data);
-  }
+
+    emitUpdate(socket, data.name + " dragged his mouse!");
+  });
+}
+
+
+function emitUpdate(socket, message) {
+  gameState.message = message;
+  socket.emit('update', gameState);
+  socket.broadcast.emit('update', gameState);
 }
 
 
 function newPlayer(name) {
-  players.push({
-    x: utils.randint(0,10),
-    y: utils.randint(0,10),
-    name: name
-  });
+  return {
+    name: name,
+    px: utils.randint(0,10),
+    py: utils.randint(0,10),
+    vx: utils.randint(0,10),
+    vy: utils.randint(0,10)
+  };
 }
 
-
-function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
-}
