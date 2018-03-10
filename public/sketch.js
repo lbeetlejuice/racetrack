@@ -23,7 +23,7 @@ function setup() {
 
 function update(gameState) {
   track = gameState.track;
-  console.log(gameState.message);
+  console.log(gameState);
   drawBackground();
   tempPlayerStates = gameState.players;
   drawCars(gameState.players);
@@ -54,32 +54,38 @@ function drawBackground() {
       return;
     }
 
-    for(var row = 0; row <= track.length; row++) {
-      for(var col = 0; col <= track[0].length; col++) {
+    for(var row = 0; row < track.length; row++) {
+      for(var col = 0; col < track[0].length; col++) {
         draw(col, row, track[row][col]);
       }
     }
 }
 
+// save, stimmt, mmann
 function mouseMoved() {
-  var aktposX;
   var data = {
     name: name,
-    col: overflow(mouseX),
-    row: overflow(mouseY)
+    col: floor(mouseX/blockSize),
+    row: floor(mouseY/blockSize)
   }
-  socket.emit('position_validity_req', data);
+
+  if (overflowWidth(data.col) || overflowHeight(data.row)) {
+    return;
+  } else {
+    socket.emit('position_validity_req', data);
+  }
 }
 
-function overflow(pos) {
-  if(pos > trackWidth) {
-    pos = trackWidth -1;
-  } elseif(pos > trackHeight) {
-    pos = trackHeight -1;
+function overflowHeight(pos) {
+  return pos >= track.length || pos < 0;
+}
+
+function overflowWidth(pos) {
+  if (track.length > 0){
+    return pos >= track[0].length || pos < 0;
   } else {
-    pos = floor(pos/blockSize);
+    return false;
   }
-  return pos;
 }
 
 function colorizedField(data) {
@@ -91,7 +97,7 @@ function colorizedField(data) {
   } else{
     fill(color('#ff0000'));
   }
-  rect(data.x*blockSize, data.y*blockSize, blockSize, blockSize);
+  rect(data.col*blockSize, data.row*blockSize, blockSize, blockSize);
 }
 
 function message() {
