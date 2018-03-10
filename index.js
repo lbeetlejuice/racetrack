@@ -27,6 +27,15 @@ function newConnection(socket){
 
     emitUpdate(socket, data.name + " dragged his mouse!");
   });
+
+  socket.on('position_validity_req', (data) => {
+    socket.emit('position_validity_res', {
+      name: data.name,
+      x: data.x,
+      y: data.y,
+      valid = posValidityCheck(data)
+    });   
+  });
 }
 
 
@@ -46,4 +55,10 @@ function newPlayer(name) {
     vy: utils.randint(0,10)
   };
 }
+
+
+function posValidityCheck(suggestion) {
+  return Math.random() >= 0.5
+}
+
 
