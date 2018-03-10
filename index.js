@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var server = app.listen(3000);
 var utils = require("./utils");
+var maps = require("./maps");
 app.use(express.static('public'));
 
 var socket = require('socket.io');
@@ -11,6 +12,7 @@ io.sockets.on('connection', newConnection);
 
 // global data structure
 var gameState = {
+  track: maps.getDefaultTrack(),
   players: []
 };
 
@@ -33,7 +35,7 @@ function newConnection(socket){
       name: data.name,
       x: data.x,
       y: data.y,
-      valid: posValidityCheck(data)
+      valid: posValidityCheck(data.x, data.y)
     });   
   });
 }
@@ -57,8 +59,8 @@ function newPlayer(name) {
 }
 
 
-function posValidityCheck(suggestion) {
-  return Math.random() >= 0.5
+function posValidityCheck(x,y) {
+  return gameState.track[x][y] == 0
 }
 
 
