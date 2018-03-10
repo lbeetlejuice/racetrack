@@ -62,12 +62,24 @@ function drawBackground() {
 }
 
 function mouseMoved() {
+  var aktposX;
   var data = {
     name: name,
-    x: floor(mouseX/blockSize),
-    y: floor(mouseY/blockSize)
+    col: overflow(mouseX),
+    row: overflow(mouseY)
   }
   socket.emit('position_validity_req', data);
+}
+
+function overflow(pos) {
+  if(pos > trackWidth) {
+    pos = trackWidth -1;
+  } elseif(pos > trackHeight) {
+    pos = trackHeight -1;
+  } else {
+    pos = floor(pos/blockSize);
+  }
+  return pos;
 }
 
 function colorizedField(data) {
