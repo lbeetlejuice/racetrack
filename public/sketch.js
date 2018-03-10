@@ -3,6 +3,15 @@ var trackWidth = 800;
 var trackHeight = 600;
 var blockSize = 50;
 
+var names = ["Uzochi Kayode", "Tafari Nkechinyere", "Akinyi Abeba", "Chibuzo Awiti", "Eniola Zephania", "Jelani Itumeleng"];
+var name = chooseRandom(names);
+
+
+// helper function to choose one out of many (array)
+function chooseRandom(myArray) {
+  return myArray[Math.floor(Math.random() * myArray.length)];
+}
+
 var track = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 							[1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
 							[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -16,27 +25,28 @@ var track = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 							[1,1,0,0,0,0,0,3,2,0,0,0,0,0,1,1],
 							[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
 
-var cvn;
-
 function setup() {
-	cvn = createCanvas(trackWidth,trackHeight);
-
-	// background(51);
-
+	createCanvas(trackWidth,trackHeight);
 	socket = io.connect('http://localhost:3000');
+    // the client says that he's ready and would like to register for a race competition
+	socket.emit('register_request', name);
 
-	socket.on('mouse', newDrawing);
-	socket.emit('i_am_ready');
-
-	socket.on('init', (ds) => {
-		// ds.forEach( (d) => {
-		// 	noStroke();
-		// 	fill(255);
-		// 	ellipse(d.x,d.y,20,20);
-		// });
-		drawBackground();
-	});
+    // register for events	
+    // socket.on('mouse', newDrawing);
+	socket.on('update', update);
 }
+
+
+function update(gameState) {
+  console.log(gameState.message);
+
+  drawBackground();
+  gameState.players.forEach( (p) => {
+  console.log(p);
+    // @Luki, draw the car images here
+  });
+}
+
 
 function newDrawing(data){
 	noStroke();
@@ -45,17 +55,18 @@ function newDrawing(data){
 }
 
 function mouseDragged(){
-	console.log('Sending: ' +mouseX + ', '+mouseY);
+	// console.log('Sending: ' +mouseX + ', '+mouseY);
 
 	var data = {
+        name: name,
 		x: mouseX,
 		y: mouseY
 	}
 	socket.emit('mouse', data);
 
-	noStroke();
-	fill(255);
-	ellipse(mouseX,mouseY,20,20);
+	// noStroke();
+	// fill(255);
+	// ellipse(mouseX,mouseY,20,20);
 }
 
 function drawBackground() {
