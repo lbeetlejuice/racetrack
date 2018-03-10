@@ -6,6 +6,12 @@ var imgs = [];
 var name;
 var tempPlayerStates;
 var track = [];
+var cnv;
+var img;
+
+function preload() {
+  img = loadImage('img/car1.png');
+}
 
 function setup() {
   createCanvas(trackWidth,trackHeight);
@@ -13,29 +19,34 @@ function setup() {
   name = message();
   socket.emit('register_request', name);
 
-  // register for events
   socket.on('update', update);
-  for(var i = 1; i < 6; i++){
-    imgs.push(loadImage("img/car"+i+".png"));
-  }
+  // for(var i = 1; i < 6; i++){
+  //   imgs.push(loadImage("img/car"+i+".png"));
+  // }
   socket.on('position_validity_res', colorizedField);
 }
 
 function update(gameState) {
   track = gameState.track;
-  console.log(gameState);
+  tempPlayerStates = gameState.players; // needed for checking valid fields
   drawBackground();
-  tempPlayerStates = gameState.players;
   drawCars(gameState.players);
 }
 
 function drawCars(players) {
+  console.log(players);
   players.forEach( (p) => {
-  console.log(p);
-  image(imgs[1],p.px*blockSize, p.py*blockSize);
+    veloX = 6; //p.vx;
+    veloY = 2; //p.vy;
+    angle = Math.atan(veloY/veloX);
+    // imageMode(CENTER);
+    // rotate(angle);
+    image(img,p.px*blockSize, p.py*blockSize);
+    // image(img,6*blockSize,8*blockSize); //imgs[1]
+    // rotate(-angle);
+    // imageMode(CORNER);
   });
 }
-
 
 function drawBackground() {
     var styleMap = {
@@ -61,7 +72,6 @@ function drawBackground() {
     }
 }
 
-// save, stimmt, mmann
 function mouseMoved() {
   var data = {
     name: name,
