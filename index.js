@@ -37,11 +37,15 @@ function newConnection(socket) {
     emitUpdate(socket, "A new player registered: " + name + ". Current number of players: " + gameState.players.length);
   });
 
+  // anyone can trigger an update. no state change occurs.
   socket.on('trigger_update', (name) => {
     console.log("update triggered by " + name);
     emitUpdate(socket, "Update triggered by " + name);
   });
 
+  // when moving the mouse over the field, the client may requests for field validity
+  // to colorize whether the car can move there or not.
+  // no state change occurs.
   socket.on('position_validity_req', (data) => {
     socket.emit('position_validity_res', {
       name: data.name,
@@ -51,13 +55,24 @@ function newConnection(socket) {
     });
   });
 
- socket.on('move_car_req', (data) => {
+  // if the request turns out to be valid, the game state is changed and the car is moved.
+  socket.on('move_car_req', (data) => {
     var isValid = utils.posValidityCheck(data.name, data.col, data.row, gameState);
     var message = "Invalid move request by " + data.name;
 
     if (isValid) {
       gameState = utils.updateCarPosition(data.name, data.col, data.row, gameState);
-      message = "Player " + data.name + " moved car!";
+      
+      // after moving the car to a valid position, check if the player state is 
+      // equal to "finished" or "killed" and update if so.
+      var updatedState = utils.checkAndUpdatePlayerState(data.name, gameState);
+      gameState = updatedState.gameState;
+      
+      if (updatedState.state === "killed" || updatedState.state === "finished") {
+        message = "Player " + data.name + " " + updatedState.state;
+      } else {
+        message = "Player " + data.name + " moved car!";
+      }
     }
     
     emitUpdate(socket, message);
@@ -65,6 +80,7 @@ function newConnection(socket) {
 }
 
 
+// general helper function to inform everyone about an update
 function emitUpdate(socket, message) {
   gameState.message = message;
   socket.emit('update', gameState);
@@ -72,14 +88,13 @@ function emitUpdate(socket, message) {
 }
 
 
+// helper: adds a new player to the game state
 function newPlayer(name) {
   var coords = maps.getStartLineCoordinates(gameState.track);
   var startCoords = utils.randomlyChooseArrayElement(coords);
-
-  console.log(coords);
-
   return {
     name: name,
+    state: "playing",
     px: startCoords[1],
     py: startCoords[0],
     vx: 0,
