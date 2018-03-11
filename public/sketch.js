@@ -6,7 +6,8 @@ var imgs = [];
 var imgscar = [];
 var imgsothercars = [];
 var name;
-var tempPlayerStates;
+var tempPlayer; // needed for checking valid fields
+var playerState = "playing"; // "playing", "killed" or "finished"
 var track = [];
 
 function preload() {
@@ -46,30 +47,32 @@ function getNameFromURL() {
 function update(gameState) {
   console.log(gameState.message);
   track = gameState.track;
-  tempPlayerStates = gameState.players; // needed for checking valid fields
+  tempPlayer = gameState.players; // needed for checking valid fields
   drawBackground();
   drawCars(gameState.players);
   var foundPlayer = findPlayer(name, gameState);
   if(foundPlayer.found) {
-    checkPlayerState(foundPlayer.player.state);
+    playerState = foundPlayer.player.state;
+    drawPlayerState(foundPlayer.player.state);
   }
 }
 
-function checkPlayerState(state) {
+function drawPlayerState(state) {
+  console.log(state);
   if(state === "finished") {
-    var s = 'FINISHD!';
+    var s = 'FINISHED!';
     textSize(32);
     textFont('Arial');
     textStyle(BOLD);
     fill(255,0,0);
-    text(x,700,500);
+    text(s,trackWidth/2, trackHeight/2);
   } else if (state === "killed") {
-    var s = 'YOU WON!';
+    var s = 'YOU LOST!';
     textSize(32);
     textFont('Arial');
     textStyle(BOLD);
     fill(255,0,0);
-    text(x,700,500);
+    text(s,trackWidth/2, trackHeight/2);
   }
 }
 
@@ -181,7 +184,9 @@ function overflowWidth(pos) {
 
 function colorizedField(data) {
   drawBackground();
-  drawCars(tempPlayerStates);
+  drawCars(tempPlayer);
+  drawPlayerState(playerState);
+
 
   if(data.valid){
     fill(color('#00ff00'));
