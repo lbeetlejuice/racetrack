@@ -12,7 +12,7 @@ module.exports = {
       players: []
     }
   },
-  findPlayer: function(name) {
+  findPlayer: function(name, gameState) {
     res = {
       found: false
     };

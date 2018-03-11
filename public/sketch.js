@@ -20,8 +20,11 @@ function setup() {
   
   // read name from URL
   name = getNameFromURL();
-  
-  socket.emit('register_request', name);
+ 
+  // trigger update (don't register) 
+  socket.emit('trigger_update', name);
+
+  // register socket.io listeners
   socket.on('update', update);
   socket.on('position_validity_res', colorizedField);
 }
@@ -32,6 +35,7 @@ function getNameFromURL() {
 }
 
 function update(gameState) {
+  console.log(gameState.message);
   track = gameState.track;
   tempPlayerStates = gameState.players; // needed for checking valid fields
   drawBackground();

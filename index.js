@@ -21,11 +21,25 @@ function newConnection(socket) {
   // - if player name is present, no new player is added, i.e. it is assumed that an existing player has reconnected
   // - if no player with that name is present, a new player is added to the game
   socket.on('register_request', (name) => {
-    var foundPlayer = utils.findPlayer(name);
+    console.log("register request by " + name);
+    var foundPlayer = utils.findPlayer(name, gameState);
+
     if (!foundPlayer.found) {
       gameState.players.push(newPlayer(name));
     }
+
+    // make response to request client
+    socket.emit('register_response', {
+      message: "player added"
+    });
+    
+    // inform all
     emitUpdate(socket, "A new player registered: " + name + ". Current number of players: " + gameState.players.length);
+  });
+
+  socket.on('trigger_update', (name) => {
+    console.log("update triggered by " + name);
+    emitUpdate(socket, "Update triggered by " + name);
   });
 
   socket.on('mouse', (data) => {
@@ -76,7 +90,7 @@ function posValidityCheck(name, col, row) {
   var maxWidth = gameState.track[0].length;
   var maxHeight = gameState.track.length;
   
-  player = utils.findPlayer(name);
+  player = utils.findPlayer(name, gameState);
   
   // error handling
   if (!player.found) return false;

@@ -9,25 +9,8 @@
 </head>
 <body>
 
-<script>
-function message() {
-  var name = "";
-  var person = prompt("Please enter your name");
-  if (person == null || person == "") {
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (var i = 0; i < 5; i++)
-      name += possible.charAt(Math.floor(Math.random() * possible.length));
-  } else {
-    name = person;
-  }
-  
-  // redirect to /<name>
-  window.location = "/" + name;
-}
-
-message();
-
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<script src="register.js"></script>
 
 </body>
 </html>
