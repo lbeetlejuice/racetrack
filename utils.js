@@ -1,3 +1,65 @@
+var checkAndUpdatePlayerState = function(name, gameState) {
+  var t = gameState.track;
+
+  var foundPlayer = findPlayer(name, gameState);
+  if (foundPlayer.found) {
+    var p = foundPlayer.player;
+    
+    // check if player hit the target line
+    if (t[p.py][p.px] == 3) {
+      return {
+        state: "finished",
+        gameState: updatePlayerState(name, "finished", gameState)     
+      }
+    }
+
+    // check if no valid fields are left
+    var validFields = getValidFields(p);
+    var foundValidField = false;
+    validFields.forEach( (pos) => {
+      var isValid = posValidityCheck(name, pos[1], pos[0], gameState);
+      if (isValid) {
+        foundValidField = true;
+      }
+    });
+
+    if (foundValidField) {
+      return {
+        state: "playing",
+        gameState: gameState // no need for change
+      }
+    } else {
+      return {
+        state: "killed",
+        gameState: updatePlayerState(name, "killed", gameState)
+      }
+    }
+  } // else --> error
+}
+
+
+// helpers for updatePlayerState
+// todo: refactor (code duplication)
+var updatePlayerState = function(name, newState, gameState) {
+    var foundPlayer = findPlayer(name, gameState);
+    if (foundPlayer.found) {
+      for(var i = 0; i < gameState.players.length; i++) {
+        if (gameState.players[i].name === name) { // updating values in p of players
+          gameState.players[i] = changeOnePlayerState(gameState.players[i], newState);
+          break;
+        }
+      }
+    }
+    return gameState;
+}
+
+
+// helpers for updatePlayerState
+var changeOnePlayerState = function(player, newState) {
+  player.state = newState;
+  return player;
+}
+
 
 // checks whether the position at col/row would be valid for car owner <name>
 // if name cannot be found within <gameState.players>, false is returned.
@@ -11,7 +73,7 @@ function posValidityCheck(name, col, row, gameState) {
   // error handling
   if (!player.found) return false;
   if (col < 0 || row < 0 || row >= maxHeight || col >= maxWidth) return false;
-  if (gameState.track[row][col] != 0) return false;
+  if (gameState.track[row][col] == 1) return false;
   
 
   var foundValidField = false;
@@ -109,6 +171,9 @@ var updateCarPosition = function(name, px, py, gameState) {
 
 
 module.exports = {
+  // checks whether the player cannot move anymore (will crashs = killed)
+  // or whether the player hit the target line
+  checkAndUpdatePlayerState: checkAndUpdatePlayerState,
 
   // provides a random integer between min and max
   randint: randint,

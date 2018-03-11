@@ -56,7 +56,6 @@ function drawCars(players) {
     var velox = p.vx;
     var veloy = p.vy;
     var pictureNumber;
-    console.log(velox,veloy);
     if(velox >= 0 && veloy == 0){          // 0°
       pictureNumber = 0;
     } else if (velox > 0 && veloy < 0) {  // 0 - 90°
@@ -74,7 +73,6 @@ function drawCars(players) {
     } else if (velox > 0 && veloy > 0) {    // 270 - 360°
       pictureNumber = 7;
     }
-    console.log(pictureNumber);
     if(p.name == name){
       image(imgscar[pictureNumber],p.px*blockSize, p.py*blockSize);
     } else {

@@ -62,7 +62,17 @@ function newConnection(socket) {
 
     if (isValid) {
       gameState = utils.updateCarPosition(data.name, data.col, data.row, gameState);
-      message = "Player " + data.name + " moved car!";
+      
+      // after moving the car to a valid position, check if the player state is 
+      // equal to "finished" or "killed" and update if so.
+      var updatedState = utils.checkAndUpdatePlayerState(data.name, gameState);
+      gameState = updatedState.gameState;
+      
+      if (updatedState.state === "killed" || updatedState.state === "finished") {
+        message = "Player " + data.name + " " + updatedState.state;
+      } else {
+        message = "Player " + data.name + " moved car!";
+      }
     }
     
     emitUpdate(socket, message);
