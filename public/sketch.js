@@ -26,11 +26,11 @@ function preload() {
 function setup() {
   createCanvas(trackWidth,trackHeight);
   socket = io.connect('http://localhost:3000');
-  
+
   // read name from URL
   name = getNameFromURL();
- 
-  // trigger update (don't register) 
+
+  // trigger update (don't register)
   socket.emit('trigger_update', name);
 
   // register socket.io listeners
@@ -59,19 +59,19 @@ function drawCars(players) {
     console.log(velox,veloy);
     if(velox >= 0 && veloy == 0){          // 0°
       pictureNumber = 0;
-    } else if (velox > 0 && veloy > 0) {  // 0 - 90°
+    } else if (velox > 0 && veloy < 0) {  // 0 - 90°
       pictureNumber = 1;
-    } else if (velox == 0 && veloy > 0) { // 90°
+    } else if (velox == 0 && veloy < 0) { // 90°
       pictureNumber = 2;
-    } else if (velox < 0 && veloy > 0) {  // 90 - 180°
+    } else if (velox < 0 && veloy < 0) {  // 90 - 180°
       pictureNumber = 3;
     } else if (velox < 0 && veloy == 0) {  // 180°
       pictureNumber = 4;
-    } else if (velox < 0 && veloy < 0) {   // 180 - 270°
+    } else if (velox < 0 && veloy > 0) {   // 180 - 270°
       pictureNumber = 5;
-    } else if (velox == 0 && veloy < 0) {   // 270°
+    } else if (velox == 0 && veloy > 0) {   // 270°
       pictureNumber = 6;
-    } else if (velox > 0 && veloy < 0) {    // 270 - 360°
+    } else if (velox > 0 && veloy > 0) {    // 270 - 360°
       pictureNumber = 7;
     }
     console.log(pictureNumber);
@@ -159,4 +159,3 @@ function colorizedField(data) {
   }
   rect(data.col*blockSize, data.row*blockSize, blockSize, blockSize);
 }
-
