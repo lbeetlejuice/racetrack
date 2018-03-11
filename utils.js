@@ -11,5 +11,18 @@ module.exports = {
       track: track,
       players: []
     }
+  },
+  findPlayer: function(name) {
+    res = {
+      found: false
+    };
+    gameState.players.forEach( (p) => {
+      if (p.name === name) {
+        res.found = true;
+        res.col = p.px;
+        res.row = p.py;
+      }
+    });
+    return res;
   }
 }

@@ -15,9 +15,16 @@ var gameState = utils.initializeGameState(maps.getDefaultTrack());
 var isReset = false;
 
 
-function newConnection(socket){
+function newConnection(socket) {
+
+  // 2 possible answers on register request:
+  // - if player name is present, no new player is added, i.e. it is assumed that an existing player has reconnected
+  // - if no player with that name is present, a new player is added to the game
   socket.on('register_request', (name) => {
-    gameState.players.push(newPlayer(name));
+    var foundPlayer = utils.findPlayer(name);
+    if (!foundPlayer.found) {
+      gameState.players.push(newPlayer(name));
+    }
     emitUpdate(socket, "A new player registered: " + name + ". Current number of players: " + gameState.players.length);
   });
 
@@ -69,7 +76,7 @@ function posValidityCheck(name, col, row) {
   var maxWidth = gameState.track[0].length;
   var maxHeight = gameState.track.length;
   
-  player = findPlayer(name);
+  player = utils.findPlayer(name);
   
   // error handling
   if (!player.found) return false;
@@ -89,21 +96,6 @@ function posValidityCheck(name, col, row) {
   });
 
   return foundValidField;
-}
-
-
-function findPlayer(name) {
-  res = {
-    found: false
-  };
-  gameState.players.forEach( (p) => {
-    if (p.name === name) {
-      res.found = true;
-      res.col = p.px;
-      res.row = p.py;
-    }
-  });
-  return res;
 }
 
 

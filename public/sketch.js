@@ -18,12 +18,17 @@ function setup() {
   createCanvas(trackWidth,trackHeight);
   socket = io.connect('http://localhost:3000');
   
-  // #todo: read name from URL
-  name = "Hansueli"; // message();
+  // read name from URL
+  name = getNameFromURL();
   
   socket.emit('register_request', name);
   socket.on('update', update);
   socket.on('position_validity_res', colorizedField);
+}
+
+function getNameFromURL() {
+  var pathArray = window.location.pathname.split( '/' );
+  return pathArray[pathArray.length-1];
 }
 
 function update(gameState) {
