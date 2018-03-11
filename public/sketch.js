@@ -12,6 +12,10 @@ function preload() {
   for(var i = 1; i < 6; i++){
     imgs.push(loadImage("img/car"+i+".png"));
   }
+  imgs.push(loadImage("img/track.png"));  //5
+  imgs.push(loadImage("img/border.png")); //6
+  imgs.push(loadImage("img/startline.png")); //7
+  imgs.push(loadImage("img/endline.png"));   //8
 }
 
 function setup() {
@@ -43,15 +47,16 @@ function drawCars(players) {
 
 function drawBackground() {
     var styleMap = {
-        0: '#e5e5e5', // race floor
-        1: '#c6c6c6', // border/wall
-        2: '#e0ffe7', // start line
-        3: '#ffe0e0'  // finish line
+        0: '5', // race floor   #e5e5e5
+        1: '6', // border/wall  #c6c6c6
+        2: '7', // start line   #e0ffe7
+        3: '8'  // finish line  #ffe0e0
     }
 
-    function draw(x, y, t) {
-      fill(color(styleMap[t]));
-      rect(x*blockSize, y*blockSize, blockSize, blockSize);
+    function draw(cal, row, t) {
+      // fill(color(styleMap[t]));
+      // rect(x*blockSize, y*blockSize, blockSize, blockSize);
+      image(imgs[styleMap[t]],cal*blockSize, row*blockSize, blockSize, blockSize);
     }
 
     if(track.length == 0) {
