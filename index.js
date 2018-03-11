@@ -37,11 +37,15 @@ function newConnection(socket) {
     emitUpdate(socket, "A new player registered: " + name + ". Current number of players: " + gameState.players.length);
   });
 
+  // anyone can trigger an update. no state change occurs.
   socket.on('trigger_update', (name) => {
     console.log("update triggered by " + name);
     emitUpdate(socket, "Update triggered by " + name);
   });
 
+  // when moving the mouse over the field, the client may requests for field validity
+  // to colorize whether the car can move there or not.
+  // no state change occurs.
   socket.on('position_validity_req', (data) => {
     socket.emit('position_validity_res', {
       name: data.name,
@@ -51,7 +55,8 @@ function newConnection(socket) {
     });
   });
 
- socket.on('move_car_req', (data) => {
+  // if the request turns out to be valid, the game state is changed and the car is moved.
+  socket.on('move_car_req', (data) => {
     var isValid = utils.posValidityCheck(data.name, data.col, data.row, gameState);
     var message = "Invalid move request by " + data.name;
 
@@ -65,6 +70,7 @@ function newConnection(socket) {
 }
 
 
+// general helper function to inform everyone about an update
 function emitUpdate(socket, message) {
   gameState.message = message;
   socket.emit('update', gameState);
@@ -72,12 +78,10 @@ function emitUpdate(socket, message) {
 }
 
 
+// helper: adds a new player to the game state
 function newPlayer(name) {
   var coords = maps.getStartLineCoordinates(gameState.track);
   var startCoords = utils.randomlyChooseArrayElement(coords);
-
-  console.log(coords);
-
   return {
     name: name,
     px: startCoords[1],
