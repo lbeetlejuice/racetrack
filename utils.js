@@ -68,16 +68,17 @@ function posValidityCheck(name, col, row, gameState) {
   var maxWidth = gameState.track[0].length;
   var maxHeight = gameState.track.length;
   
-  player = findPlayer(name, gameState);
+  var foundPlayer = findPlayer(name, gameState);
   
   // error handling
-  if (!player.found) return false;
+  if (!foundPlayer.found) return false;
+  if (foundPlayer.player.state !== "playing") return false;
   if (col < 0 || row < 0 || row >= maxHeight || col >= maxWidth) return false;
   if (gameState.track[row][col] == 1) return false;
   
 
   var foundValidField = false;
-  vfs = getValidFields(player.player)
+  vfs = getValidFields(foundPlayer.player)
   vfs.forEach( (vf) => {
     var validRow = vf[0];
     var validCol = vf[1];
