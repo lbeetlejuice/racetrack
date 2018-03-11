@@ -108,7 +108,18 @@ function drawBackground() {
     }
 }
 
+
+function mouseClicked() {
+  sendPlayerActionToServer('move_car_req');
+}
+
+
 function mouseMoved() {
+  sendPlayerActionToServer('position_validity_req');
+}
+
+
+function sendPlayerActionToServer(adr) {
   var data = {
     name: name,
     col: floor(mouseX/blockSize),
@@ -118,9 +129,10 @@ function mouseMoved() {
   if (overflowWidth(data.col) || overflowHeight(data.row)) {
     return;
   } else {
-    socket.emit('position_validity_req', data);
+    socket.emit(adr, data);
   }
 }
+
 
 function overflowHeight(pos) {
   return pos >= track.length || pos < 0;
