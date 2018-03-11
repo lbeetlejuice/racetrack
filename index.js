@@ -71,6 +71,8 @@ function posValidityCheck(name, col, row) {
   // error handling
   if (!player.found) return false;
   if (col < 0 || row < 0 || row >= maxHeight || col >= maxWidth) return false;
+  if (gameState.track[row][col] != 0) return false;
+  
 
   var foundValidField = false;
   vfs = getValidFields(player.row, player.col)
