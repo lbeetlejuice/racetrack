@@ -42,20 +42,25 @@ function newConnection(socket) {
     emitUpdate(socket, "Update triggered by " + name);
   });
 
-  socket.on('mouse', (data) => {
-    // socket.broadcast.emit('mouse', data);
-    console.log(data);
-
-    emitUpdate(socket, data.name + " dragged his mouse!");
-  });
-
   socket.on('position_validity_req', (data) => {
     socket.emit('position_validity_res', {
       name: data.name,
       row: data.row,
       col: data.col,
-      valid: posValidityCheck(data.name, data.col, data.row)
+      valid: utils.posValidityCheck(data.name, data.col, data.row, gameState)
     });
+  });
+
+ socket.on('move_car_req', (data) => {
+    var isValid = utils.posValidityCheck(data.name, data.col, data.row, gameState);
+    var message = "Invalid move request by " + data.name;
+
+    if (isValid) {
+      gameState = utils.updateCarPosition(data.name, data.col, data.row, gameState);
+      message = "Player " + data.name + " moved car!";
+    }
+    
+    emitUpdate(socket, message);
   });
 }
 
@@ -80,51 +85,6 @@ function newPlayer(name) {
     vx: 0,
     vy: 0
   };
-}
-
-
-// checks whether the position at col/row would be valid for car owner <name>
-// if name cannot be found within <gameState.players>, false is returned.
-function posValidityCheck(name, col, row) {
-  // readability
-  var maxWidth = gameState.track[0].length;
-  var maxHeight = gameState.track.length;
-  
-  player = utils.findPlayer(name, gameState);
-  
-  // error handling
-  if (!player.found) return false;
-  if (col < 0 || row < 0 || row >= maxHeight || col >= maxWidth) return false;
-  if (gameState.track[row][col] != 0) return false;
-  
-
-  var foundValidField = false;
-  vfs = getValidFields(player.row, player.col)
-  vfs.forEach( (vf) => {
-    var validRow = vf[0];
-    var validCol = vf[1];
-
-    if (row == validRow && col == validCol) {
-      foundValidField = true;
-    }
-  });
-
-  return foundValidField;
-}
-
-
-function getValidFields(row, col) {
-  return [
-    [row, col],
-    [row+1, col],
-    [row-1, col],
-    [row, col+1],
-    [row+1, col+1],
-    [row-1, col+1],
-    [row, col-1],
-    [row+1, col-1],
-    [row-1, col-1]
-  ]
 }
 
 
