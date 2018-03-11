@@ -35,7 +35,7 @@ function newConnection(socket){
       name: data.name,
       row: data.row,
       col: data.col,
-      valid: posValidityCheck(data.col, data.row)
+      valid: posValidityCheck(data.name, data.col, data.row)
     });
   });
 }
@@ -59,17 +59,62 @@ function newPlayer(name) {
 }
 
 
-function posValidityCheck(col, row) {
-  var t = gameState.track;
+// checks whether the position at col/row would be valid for car owner <name>
+// if name cannot be found within <gameState.players>, false is returned.
+function posValidityCheck(name, col, row) {
+  // readability
+  var maxWidth = gameState.track[0].length;
+  var maxHeight = gameState.track.length;
+  
+  player = findPlayer(name);
+  
+  // error handling
+  if (!player.found) return false;
+  if (col < 0 || row < 0 || row >= maxHeight || col >= maxWidth) return false;
+  if (gameState.track[row][col] != 0) return false;
+  
 
-  var maxWidth = t[0].length;
-  var maxHeight = t.length;
-  console.log("col: " + col + " / " + maxWidth);
-  console.log("row: " + row + " / " + maxHeight);
+  var foundValidField = false;
+  vfs = getValidFields(player.row, player.col)
+  vfs.forEach( (vf) => {
+    var validRow = vf[0];
+    var validCol = vf[1];
 
-  if (col < 0 || row < 0 || row >= maxHeight || col >= maxWidth) {
-    return false
-  } else {
-    return gameState.track[row][col] != 1
-  }
+    if (row == validRow && col == validCol) {
+      foundValidField = true;
+    }
+  });
+
+  return foundValidField;
 }
+
+
+function findPlayer(name) {
+  res = {
+    found: false
+  };
+  gameState.players.forEach( (p) => {
+    if (p.name === name) {
+      res.found = true;
+      res.col = p.px;
+      res.row = p.py;
+    }
+  });
+  return res;
+}
+
+
+function getValidFields(row, col) {
+  return [
+    [row, col],
+    [row+1, col],
+    [row-1, col],
+    [row, col+1],
+    [row+1, col+1],
+    [row-1, col+1],
+    [row, col-1],
+    [row+1, col-1],
+    [row-1, col-1]
+  ]
+}
+
