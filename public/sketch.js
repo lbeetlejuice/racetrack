@@ -49,6 +49,41 @@ function update(gameState) {
   tempPlayerStates = gameState.players; // needed for checking valid fields
   drawBackground();
   drawCars(gameState.players);
+  var foundPlayer = findPlayer(name, gameState);
+  if(foundPlayer.found) {
+    checkPlayerState(foundPlayer.player.state);
+  }
+}
+
+function checkPlayerState(state) {
+  if(state === "finished") {
+    var s = 'FINISHD!';
+    textSize(32);
+    textFont('Arial');
+    textStyle(BOLD);
+    fill(255,0,0);
+    text(x,700,500);
+  } else if (state === "killed") {
+    var s = 'YOU WON!';
+    textSize(32);
+    textFont('Arial');
+    textStyle(BOLD);
+    fill(255,0,0);
+    text(x,700,500);
+  }
+}
+
+var findPlayer = function(name, gameState) {
+  res = {
+    found: false
+  };
+  gameState.players.forEach( (p) => {
+    if (p.name === name) {
+      res.found = true;
+      res.player = p;
+    }
+  });
+  return res;
 }
 
 function drawCars(players) {
@@ -76,9 +111,9 @@ function drawCars(players) {
     }
     console.log(pictureNumber);
     if(p.name == name){
-      image(imgscar[pictureNumber],p.px*blockSize, p.py*blockSize);
+      image(imgscar[pictureNumber],p.px*blockSize, p.py*blockSize, blockSize, blockSize);
     } else {
-      image(imgsothercars[pictureNumber],p.px*blockSize, p.py*blockSize);
+      image(imgsothercars[pictureNumber],p.px*blockSize, p.py*blockSize, blockSize, blockSize);
     }
   });
 }
