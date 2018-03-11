@@ -49,12 +49,17 @@ function emitUpdate(socket, message) {
 
 
 function newPlayer(name) {
+  var coords = maps.getStartLineCoordinates(gameState.track);
+  var startCoords = utils.randomlyChooseArrayElement(coords);
+
+  console.log(coords);
+
   return {
     name: name,
-    px: utils.randint(0,10),
-    py: utils.randint(0,10),
-    vx: utils.randint(0,10),
-    vy: utils.randint(0,10)
+    px: startCoords[1],
+    py: startCoords[0],
+    vx: 0,
+    vy: 0
   };
 }
 
