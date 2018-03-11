@@ -6,11 +6,12 @@ var imgs = [];
 var name;
 var tempPlayerStates;
 var track = [];
-var cnv;
-var img;
 
 function preload() {
-  img = loadImage('img/car1.png');
+  // img = loadImage('img/car1.png');
+  for(var i = 1; i < 6; i++){
+    imgs.push(loadImage("img/car"+i+".png"));
+  }
 }
 
 function setup() {
@@ -18,11 +19,7 @@ function setup() {
   socket = io.connect('http://localhost:3000');
   name = message();
   socket.emit('register_request', name);
-
   socket.on('update', update);
-  // for(var i = 1; i < 6; i++){
-  //   imgs.push(loadImage("img/car"+i+".png"));
-  // }
   socket.on('position_validity_res', colorizedField);
 }
 
@@ -36,15 +33,11 @@ function update(gameState) {
 function drawCars(players) {
   console.log(players);
   players.forEach( (p) => {
-    veloX = 6; //p.vx;
-    veloY = 2; //p.vy;
-    angle = Math.atan(veloY/veloX);
-    // imageMode(CENTER);
-    // rotate(angle);
-    image(img,p.px*blockSize, p.py*blockSize);
-    // image(img,6*blockSize,8*blockSize); //imgs[1]
-    // rotate(-angle);
-    // imageMode(CORNER);
+    if(p.name == name){
+      image(imgs[1],p.px*blockSize, p.py*blockSize);
+    } else {
+      image(imgs[0],p.px*blockSize, p.py*blockSize);
+    }
   });
 }
 
