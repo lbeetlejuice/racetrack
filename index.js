@@ -50,7 +50,9 @@ function emitUpdate(socket, message) {
 
 function newPlayer(name) {
   var coords = maps.getStartLineCoordinates(gameState.track);
-  var startCoords = maps.randomlyChooseArrayElement(coords);
+  var startCoords = utils.randomlyChooseArrayElement(coords);
+
+  console.log(coords);
 
   return {
     name: name,

@@ -23,7 +23,9 @@ module.exports = {
     var coords = []
     for (var row = 0; row < track.length; row++) {
       for (var col = 0; col < track[0].length; col++) {
-        coords.push([row, col]);
+        if (track[row][col] == 2) {
+          coords.push([row, col]);
+        }
       }
     }
     return coords;
