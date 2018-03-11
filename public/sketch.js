@@ -150,8 +150,6 @@ function colorizedField(data) {
   drawBackground();
   drawCars(tempPlayerStates);
 
-  console.log(data);
-
   if(data.valid){
     fill(color('#00ff00'));
   } else{

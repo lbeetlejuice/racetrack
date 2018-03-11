@@ -84,6 +84,7 @@ function newPlayer(name) {
   var startCoords = utils.randomlyChooseArrayElement(coords);
   return {
     name: name,
+    state: "playing",
     px: startCoords[1],
     py: startCoords[0],
     vx: 0,
