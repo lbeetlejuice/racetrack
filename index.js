@@ -3,7 +3,7 @@ var app = express();
 var server = app.listen(3000);
 var utils = require("./utils");
 var maps = require("./maps");
-app.use(express.static('public'));
+app.use("/", express.static('public'));
 
 var socket = require('socket.io');
 var io = socket(server);
@@ -11,16 +11,35 @@ io.sockets.on('connection', newConnection);
 
 
 // global data structure
-var gameState = {
-  track: maps.getDefaultTrack(),
-  players: []
-};
+var gameState = utils.initializeGameState(maps.getDefaultTrack());
+var isReset = false;
 
 
-function newConnection(socket){
+function newConnection(socket) {
+
+  // 2 possible answers on register request:
+  // - if player name is present, no new player is added, i.e. it is assumed that an existing player has reconnected
+  // - if no player with that name is present, a new player is added to the game
   socket.on('register_request', (name) => {
-    gameState.players.push(newPlayer(name));
+    console.log("register request by " + name);
+    var foundPlayer = utils.findPlayer(name, gameState);
+
+    if (!foundPlayer.found) {
+      gameState.players.push(newPlayer(name));
+    }
+
+    // make response to request client
+    socket.emit('register_response', {
+      message: "player added"
+    });
+    
+    // inform all
     emitUpdate(socket, "A new player registered: " + name + ". Current number of players: " + gameState.players.length);
+  });
+
+  socket.on('trigger_update', (name) => {
+    console.log("update triggered by " + name);
+    emitUpdate(socket, "Update triggered by " + name);
   });
 
   socket.on('mouse', (data) => {
@@ -71,7 +90,7 @@ function posValidityCheck(name, col, row) {
   var maxWidth = gameState.track[0].length;
   var maxHeight = gameState.track.length;
   
-  player = findPlayer(name);
+  player = utils.findPlayer(name, gameState);
   
   // error handling
   if (!player.found) return false;
@@ -94,21 +113,6 @@ function posValidityCheck(name, col, row) {
 }
 
 
-function findPlayer(name) {
-  res = {
-    found: false
-  };
-  gameState.players.forEach( (p) => {
-    if (p.name === name) {
-      res.found = true;
-      res.col = p.px;
-      res.row = p.py;
-    }
-  });
-  return res;
-}
-
-
 function getValidFields(row, col) {
   return [
     [row, col],
@@ -122,4 +126,25 @@ function getValidFields(row, col) {
     [row-1, col-1]
   ]
 }
+
+
+app.get('/', function (req, res) {
+  res.send("register here ... ");
+});
+
+
+
+// other controllings
+app.get('/reset', function (req, res) {
+  gameState = utils.initializeGameState(maps.getDefaultTrack());
+  isReset = true;
+  res.send("Game has been resetted!");
+});
+
+
+app.get('/:name', function (req, res) {
+  // res.send("your name: " + req.params.name);
+  res.sendFile(__dirname + "/public/game.html");
+});
+
 

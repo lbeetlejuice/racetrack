@@ -5,5 +5,24 @@ module.exports = {
   },
   randomlyChooseArrayElement: function (arr) {
     return arr[Math.floor(Math.random() * arr.length)];
+  },
+  initializeGameState: function(track) {
+    return {
+      track: track,
+      players: []
+    }
+  },
+  findPlayer: function(name, gameState) {
+    res = {
+      found: false
+    };
+    gameState.players.forEach( (p) => {
+      if (p.name === name) {
+        res.found = true;
+        res.col = p.px;
+        res.row = p.py;
+      }
+    });
+    return res;
   }
-};
+}

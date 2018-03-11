@@ -21,13 +21,25 @@ function preload() {
 function setup() {
   createCanvas(trackWidth,trackHeight);
   socket = io.connect('http://localhost:3000');
-  name = message();
-  socket.emit('register_request', name);
+  
+  // read name from URL
+  name = getNameFromURL();
+ 
+  // trigger update (don't register) 
+  socket.emit('trigger_update', name);
+
+  // register socket.io listeners
   socket.on('update', update);
   socket.on('position_validity_res', colorizedField);
 }
 
+function getNameFromURL() {
+  var pathArray = window.location.pathname.split( '/' );
+  return pathArray[pathArray.length-1];
+}
+
 function update(gameState) {
+  console.log(gameState.message);
   track = gameState.track;
   tempPlayerStates = gameState.players; // needed for checking valid fields
   drawBackground();
@@ -110,15 +122,3 @@ function colorizedField(data) {
   rect(data.col*blockSize, data.row*blockSize, blockSize, blockSize);
 }
 
-function message() {
-  var name = "";
-  var person = prompt("Please enter your name");
-  if (person == null || person == "") {
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (var i = 0; i < 5; i++)
-      name += possible.charAt(Math.floor(Math.random() * possible.length));
-  } else {
-    name = person;
-  }
-  return name;
-}
