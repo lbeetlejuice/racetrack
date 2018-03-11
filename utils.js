@@ -5,5 +5,11 @@ module.exports = {
   },
   randomlyChooseArrayElement: function (arr) {
     return arr[Math.floor(Math.random() * arr.length)];
+  },
+  initializeGameState: function(track) {
+    return {
+      track: track,
+      players: []
+    }
   }
-};
+}

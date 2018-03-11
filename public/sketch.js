@@ -17,7 +17,10 @@ function preload() {
 function setup() {
   createCanvas(trackWidth,trackHeight);
   socket = io.connect('http://localhost:3000');
-  name = message();
+  
+  // #todo: read name from URL
+  name = "Hansueli"; // message();
+  
   socket.emit('register_request', name);
   socket.on('update', update);
   socket.on('position_validity_res', colorizedField);
@@ -105,15 +108,3 @@ function colorizedField(data) {
   rect(data.col*blockSize, data.row*blockSize, blockSize, blockSize);
 }
 
-function message() {
-  var name = "";
-  var person = prompt("Please enter your name");
-  if (person == null || person == "") {
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (var i = 0; i < 5; i++)
-      name += possible.charAt(Math.floor(Math.random() * possible.length));
-  } else {
-    name = person;
-  }
-  return name;
-}

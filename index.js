@@ -3,7 +3,7 @@ var app = express();
 var server = app.listen(3000);
 var utils = require("./utils");
 var maps = require("./maps");
-app.use(express.static('public'));
+app.use("/", express.static('public'));
 
 var socket = require('socket.io');
 var io = socket(server);
@@ -11,10 +11,8 @@ io.sockets.on('connection', newConnection);
 
 
 // global data structure
-var gameState = {
-  track: maps.getDefaultTrack(),
-  players: []
-};
+var gameState = utils.initializeGameState(maps.getDefaultTrack());
+var isReset = false;
 
 
 function newConnection(socket){
@@ -122,4 +120,25 @@ function getValidFields(row, col) {
     [row-1, col-1]
   ]
 }
+
+
+app.get('/', function (req, res) {
+  res.send("register here ... ");
+});
+
+
+
+// other controllings
+app.get('/reset', function (req, res) {
+  gameState = utils.initializeGameState(maps.getDefaultTrack());
+  isReset = true;
+  res.send("Game has been resetted!");
+});
+
+
+app.get('/:name', function (req, res) {
+  // res.send("your name: " + req.params.name);
+  res.sendFile(__dirname + "/public/game.html");
+});
+
 
